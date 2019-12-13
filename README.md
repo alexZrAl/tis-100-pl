@@ -5,7 +5,7 @@ Yet another in-flight (physical) pet project. The project parses pseudo-assembly
 ## Technical stack
 
 Parsing: SWI-Prolog v8.0.3
-Runtime: Python? Java? Javascript? c++ <-- probably not? prolog <-- NO! 
+Runtime: c++? Java? SALSA???  <!-- just realized this is a multithreaded runtime so salsa may actually be useful?? !>
 
 ## Roadmap
 
