@@ -10,6 +10,6 @@ Runtime: c++? Java? SALSA???  <!-- just realized this is a multithreaded runtime
 ## Roadmap
 
 - Version 1.0: Full parsing.
-- Version 1.2: Interpreter w/ Input/Output as txt file
+- Version 1.2: Interpreter w/ Input/Output/Node configuration as txt file
 - Version 2.0: Input/Output as GUI/TUI
 - Version 2.?: vs-code plugin?
