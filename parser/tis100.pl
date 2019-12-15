@@ -1,10 +1,23 @@
-line --> unary, reg1 | binary, reg1, reg2 | branch, _ | [#], _ | _, [:] | noarg.
+% TIS-100 Grammar
+line --> noarg |
+         unary, reg1 |
+         [mov], reg1, non_literal| 
+         branch, lblOrComment | 
+         [#], lblOrComment | lblOrComment, [:].
 
 noarg --> [nop] | [swp] | [sav] | [neg]. % no argument instructions
 unary --> [add] | [sub]. % unary
-binary --> [mov]. % binary
+
 branch --> [jmp] | [jez] | [jnz] | [jgz] | [jlz] | [jro]. % branch instructions
 
 reg1 --> [up] | [down] | [left] | [right] | [acc] | literal.
-reg2 --> [up] | [down] | [left] | [right] | [acc].
-literal --> [nil] | [Int], {between(-9, 9, Int)}. % yep, TIS instruction set supports only +- 99, in debug phase we use +- 9 for simplicity
+non_literal --> [up] | [down] | [left] | [right] | [acc] | [nil].
+literal --> [Int], {between(-3, 3, Int)}. % yep, TIS instruction set supports only +- 99, in debug phase we use +- 3 for simplicity
+lblOrComment --> [X], {string(X)}.
+
+
+% driver function for testing purposes, argv[1] should be a single line
+main(Argv) :-
+    [Line | _] = Argv,
+    split_string(Line, " ", " ", SubStrings),   % still a bit problematic.....
+    phrase(line, SubStrings).
