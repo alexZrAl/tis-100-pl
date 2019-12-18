@@ -1,7 +1,7 @@
 % TIS-100 Grammar
-line --> noarg |
-         unary, reg1 |
-         ["mov"], reg1, non_literal| 
+stmt --> noarg |
+         unary, arg1 |
+         ["mov"], arg1, non_literal|    % mov is the only binary instruction in tis-100
          branch, lblOrComment | 
          ["#"], lblOrComment | lblOrComment, [":"].
 
@@ -10,18 +10,33 @@ unary --> ["add"] | ["sub"]. % unary
 
 branch --> ["jmp"] | ["jez"] | ["jnz"] | ["jgz"] | ["jlz"] | ["jro"]. % branch instructions
 
-reg1 --> ["up"] | ["down"] | ["left"] | ["right"] | ["acc"] | literal.
-non_literal --> ["up"] | ["down"] | ["left"] | ["right"] | ["acc"] | ["nil"].
-literal --> [Int], {between(-3, 3, Int)}. % yep, TIS instruction set supports only +- 99, in debug phase we use +- 3 for simplicity
+reg --> ["up"] | ["down"] | ["left"] | ["right"] | ["acc"].
+arg1 --> reg | literal.
+non_literal --> reg | ["nil"].
+literal --> [S], {number_string(Int, S), between(-99, 99, Int)}. % yep, TIS instruction set supports only +- 99
 lblOrComment --> [X], {string(X)}.
 
+% prolog IO, https://stackoverflow.com/questions/23411139/prolog-unexpected-end-of-file
+read_file(Stream,[]) :-
+    at_end_of_stream(Stream).
 
-% driver function for testing purposes, argv[1] should be a single line
+read_file(Stream,[X|L]) :-
+    \+ at_end_of_stream(Stream),
+    read_line_to_codes(Stream,Codes),
+    atom_chars(X, Codes),
+    split_string(X, " ", " ", SubStrings),
+    % check
+    write(SubStrings),
+    ( phrase(stmt, SubStrings) ->
+        writeln(" <-- Good");
+        writeln(" <-- Syntax error")
+    ),
+    read_file(Stream,L), 
+    !.
+
+% driver function for testing purposes, argv[1] should be a filename, ascii text
 main(Argv) :-
-    [Line | _] = Argv,
-    split_string(Line, " ", " ", SubStrings),   % still a bit problematic.....
-    (phrase(line, SubStrings) ->
-        writeln("Good");
-
-        writeln("Bad")
-    ).
+    open(Argv, read, Str),
+    read_file(Str,Lines),
+    close(Str),
+    write(Lines), nl.
